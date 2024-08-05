@@ -174,25 +174,25 @@ function MainApp({ selectedFile }) {
     window.open('http://localhost:3001/', '_blank');
   };
 
-  const changeFontSize = (increase) => {
-    const selection = window.getSelection();
-    if (!selection.rangeCount) return;
+  // const changeFontSize = (increase) => {
+  //   const selection = window.getSelection();
+  //   if (!selection.rangeCount) return;
 
-    const range = selection.getRangeAt(0);
-    const span = document.createElement('span');
-    const currentSize = window.getComputedStyle(range.startContainer.parentElement).fontSize;
-    const newSize = increase ? parseInt(currentSize) + 2 : parseInt(currentSize) - 2;
+  //   const range = selection.getRangeAt(0);
+  //   const span = document.createElement('span');
+  //   const currentSize = window.getComputedStyle(range.startContainer.parentElement).fontSize;
+  //   const newSize = increase ? parseInt(currentSize) + 2 : parseInt(currentSize) - 2;
 
-    span.style.fontSize = `${newSize}px`;
-    span.appendChild(range.extractContents());
-    range.insertNode(span);
+  //   span.style.fontSize = `${newSize}px`;
+  //   span.appendChild(range.extractContents());
+  //   range.insertNode(span);
 
-    const newRange = document.createRange();
-    newRange.setStart(span, 0);
-    newRange.setEnd(span, span.childNodes.length);
-    selection.removeAllRanges();
-    selection.addRange(newRange);
-  };
+  //   const newRange = document.createRange();
+  //   newRange.setStart(span, 0);
+  //   newRange.setEnd(span, span.childNodes.length);
+  //   selection.removeAllRanges();
+  //   selection.addRange(newRange);
+  // };
 
   const handleSummary = async () => {
     const selection = window.getSelection();
@@ -347,6 +347,27 @@ function MainApp({ selectedFile }) {
     }
   };
 
+  const changeFontSize = (size) => {
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    const span = document.createElement('span');
+    span.style.fontSize = `${size}px`;
+    span.appendChild(range.extractContents());
+    range.insertNode(span);
+
+    const newRange = document.createRange();
+    newRange.setStart(span, 0);
+    newRange.setEnd(span, span.childNodes.length);
+    selection.removeAllRanges();
+    selection.addRange(newRange);
+  };
+
+  const handleFontSizeChange = (e) => {
+    const size = e.target.value;
+    changeFontSize(size);
+  };
   return (
     <div className="App">
       <div className="header fixed-header">
@@ -480,6 +501,13 @@ function MainApp({ selectedFile }) {
             zIndex: 1000,
           }}
         >
+          <select style={{ margin: '1px' }} onChange={handleFontSizeChange} defaultValue="20">
+            {Array.from({ length: 100 }, (_, i) => i + 1).map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
           <button style={{ margin: '1px' }} onClick={handlePlainText}>Plain</button>
           <button style={{ margin: '1px' }} onClick={() => document.execCommand('bold', false, null)}>Bold</button>
           <button style={{ margin: '1px' }} onClick={() => document.execCommand('underline', false, null)}>Underline</button>
