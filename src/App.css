@@ -1,0 +1,166 @@
+.App {
+  text-align: center;
+}
+
+body {
+  font-family: 'Noto Serif JP', serif;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  padding: 0 10px;
+  border-bottom: 1px solid #b0c4de;
+  height: 50px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.toolbar button {
+  margin: 0 5px;
+}
+
+.container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.slide {
+  flex: 1;
+  background-color: #fff;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.slide .title {
+  font-size: 24px;
+  width: 100%;
+  outline: none;
+  border: 1px solid #b0c4de;
+  background: linear-gradient(white 90%, #f4f4f4 90%) 0 0 / 100% 20px;
+  padding: 5px;
+  box-sizing: border-box;
+}
+
+.slide .content {
+  flex: 1;
+  font-size: 18px;
+  width: 100%;
+  outline: none;
+  border: 1px solid #b0c4de;
+  background: linear-gradient(white 90%, #f4f4f4 90%) 0 0 / 100% 20px;
+  margin-top:5px;
+  padding: 5px;
+  resize: none;
+  box-sizing: border-box;
+  margin-bottom: 20px;
+  text-align: left; 
+}
+
+.file-name {
+  margin-left: 10px; /* 必要に応じて調整 */
+  margin-top: 5px;
+}
+
+.notebook-background {
+  background: linear-gradient(to bottom, white 95%, #e0e0e0 95%);
+  background-size: 100% 30px;
+}
+
+.transparent-background {
+  background: transparent;
+}
+
+.content:empty:before {
+  content: attr(data-placeholder);
+  color: #aaa;
+  pointer-events: none;
+  font-size:x-large;
+}
+
+.main-scroll-button {
+  position: fixed;
+  right: 20px;
+  background-color: gray;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 1000;
+}
+
+.main-scroll-button.up {
+  bottom: 80px; /* 上に戻るボタンの位置 */
+}
+
+.main-scroll-button.down {
+  bottom: 20px; /* 下に進むボタンの位置 */
+}
+
+.fixed-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: white; /* Ensure the background is white to cover content behind */
+}
+
+.scroll-to-top, .scroll-to-bottom {
+  background-color: #fff;
+  border: none;
+  padding: 10px;
+  border-radius: 50%;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  position: fixed;
+  right: 20px;
+  z-index: 1000;
+}
+
+.scroll-to-top {
+  bottom: 80px; /* 上に戻るボタンの位置 */
+}
+
+.scroll-to-bottom {
+  bottom: 20px; /* 下に進むボタンの位置 */
+}
+
+.scroll-to-top:hover, .scroll-to-bottom:hover {
+  background-color: #f0f0f0;
+}

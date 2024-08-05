@@ -1,0 +1,51 @@
+.header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: white;
+  z-index: 1000; /* 他のコンテンツの上に表示されるようにする */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* オプション: 視認性を高めるための影を追加 */
+}
+  
+  .logo {
+    /* ロゴのスタイル */
+  }
+  
+  .container {
+    margin-top: 60px; /* ヘッダーの高さに応じてこの値を調整 */
+  }
+  
+  .file-list {
+    /* ファイルリストのスタイル */
+    text-align: left; /* 左寄せ */
+  }
+  
+  .file-item {
+    margin-left: 20px; /* デフォルトのインデント */
+  }
+  
+  .icon {
+    /* アイコンのスタイル */
+  }
+
+  .scroll-buttons {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .scroll-to-top, .scroll-to-bottom {
+    background-color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+  }
+  
+  .scroll-to-top:hover, .scroll-to-bottom:hover {
+    background-color: #f0f0f0;
+  }
