@@ -368,6 +368,55 @@ function MainApp({ selectedFile }) {
     const size = e.target.value;
     changeFontSize(size);
   };
+
+  const handleSQL = async () => {
+    const question = prompt('どんなSQLを提案してほしいか？');
+    const contextIds = prompt('使用するコンテキストのIDをカンマ区切りで入力してください:');
+  
+    if (!question || !contextIds) {
+      alert('質問とコンテキストのIDが必要です');
+      return;
+    }
+  
+    const contextIdArray = contextIds.split(',').map(id => id.trim());
+    let combinedContent = '';
+  
+    try {
+      for (const contextId of contextIdArray) {
+        const response = await fetch(`http://localhost:3000/api/files/${contextId}`);
+        if (response.ok) {
+          const data = await response.json();
+          combinedContent += data.content + '\n';
+        } else {
+          const errorText = await response.text();
+          console.error(`Failed to fetch file data for ID ${contextId}:`, errorText);
+        }
+      }
+  
+      const response = await fetch('http://localhost:3000/api/sqlChat', { // 新しいAPIエンドポイントを使用
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question, context: combinedContent }),
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log('\n回答:\n', data.answer);
+        setModalContent(data.answer.replace(/\n/g, '<br>')); // モーダルの内容を設定
+        setShowModal(true); // モーダルを表示
+      } else {
+        const errorText = await response.text();
+        console.error('質問の送信に失敗しました:', errorText);
+        alert('質問の送信に失敗しました');
+      }
+    } catch (error) {
+      console.error('質問の送信エラー:', error);
+      alert('質問の送信に失敗しました');
+    }
+  };
+
   return (
     <div className="App">
       <div className="header fixed-header">
@@ -513,6 +562,7 @@ function MainApp({ selectedFile }) {
           <button style={{ margin: '1px' }} onClick={() => document.execCommand('underline', false, null)}>Underline</button>
           <button style={{ margin: '1px' }} onClick={handleAsk}>Ask</button>
           <button style={{ margin: '1px' }} onClick={handleSummary}>Summary</button>
+          <button style={{ margin: '1px' }} onClick={handleSQL}>SQL</button> 
           {/* <button style={{ margin: '1px' }} onClick={handleNewSummary}>New Summary</button> 新しい要約ボタンを追加 */}
         </div>
         )}

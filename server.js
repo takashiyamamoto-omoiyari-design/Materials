@@ -14,6 +14,47 @@ app.use(express.json());
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+app.post('/api/sqlChat', async (req, res) => {
+  const { question, context } = req.body;
+  console.log('受け取った質問:', question); // 受け取った質問をログに記録
+  console.log('使用するコンテキスト:', context); // 使用するコンテキストをログに記録
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+          model: 'gpt-4o-mini',
+          messages: [
+            { role: 'system', content: `あなたはSQLマスターです。コンテキストのSQLのみを汲み取って質問に対する回答としてSQLを提案ください。: ${context}` },
+            { role: 'user', content: question }
+          ],
+          max_tokens: 1000,
+          n: 1,
+          stop: null,
+          temperature: 0.7,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const answer = data.choices[0].message.content.trim();
+      console.log(`\n生成された回答:\n${answer}`); // 生成された回答をログに記録
+      res.json({ answer });
+    } else {
+      const errorDetails = await response.text();
+      console.error('SQLチャットAPIの呼び出しに失敗しました:', response.statusText, errorDetails);
+      res.status(response.status).send(response.statusText);
+    }
+  } catch (error) {
+    console.error('SQLチャットAPIの呼び出し中にエラーが発生しました:', error.message);
+    res.status(500).send(error.message);
+  }
+});
+
 app.post('/api/summarize', async (req, res) => {
   const { text } = req.body;
   console.log('要約するために受け取ったテキスト:', text); // 受け取ったテキストをログに記録
