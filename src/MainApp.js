@@ -416,6 +416,44 @@ function MainApp({ selectedFile }) {
       alert('質問の送信に失敗しました');
     }
   };
+  const handleImg2SQL = async (event) => {
+    const file = event.target.files[0];
+  
+    if (!file) {
+      alert('画像ファイルが必要です');
+      return;
+    }
+  
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      const base64Image = reader.result.split(',')[1];
+  
+      try {
+        const response = await fetch('http://localhost:3000/api/sqlFromImage', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ image: base64Image }),
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log('\n生成されたSQL:\n', data.answer);
+          setModalContent(data.answer.replace(/\n/g, '<br>')); // モーダルの内容を設定
+          setShowModal(true); // モーダルを表示
+        } else {
+          const errorText = await response.text();
+          console.error('画像からSQL生成に失敗しました:', errorText);
+          alert('画像からSQL生成に失敗しました');
+        }
+      } catch (error) {
+        console.error('画像からSQL生成エラー:', error);
+        alert('画像からSQL生成に失敗しました');
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="App">
@@ -563,8 +601,9 @@ function MainApp({ selectedFile }) {
           <button style={{ margin: '1px' }} onClick={handleAsk}>Ask</button>
           <button style={{ margin: '1px' }} onClick={handleSummary}>Summary</button>
           <button style={{ margin: '1px' }} onClick={handleSQL}>SQL</button> 
-          {/* <button style={{ margin: '1px' }} onClick={handleNewSummary}>New Summary</button> 新しい要約ボタンを追加 */}
-        </div>
+          <button style={{ margin: '1px' }} onClick={() => document.getElementById('img2SQLInput').click()}>img2SQL</button>
+          <input id="img2SQLInput" type="file" accept="image/*" onChange={handleImg2SQL} style={{ display: 'none' }} />
+          </div>
         )}
       </div>
       <Modal show={showModal} onClose={() => setShowModal(false)}>

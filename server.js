@@ -5,14 +5,66 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const mysql = require('mysql');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args)); // 動的インポート
+const Tesseract = require('tesseract.js');
+
 const app = express();
 const port = 3000;
+
+// body-parserの設定を更新して、リクエストボディのサイズ制限を増やす
+app.use(bodyParser.json({ limit: '50mb' }));
+app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
 // const fetch = require('node-fetch');
 app.use(cors()); 
 app.use(express.json());
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+app.post('/api/sqlFromImage', async (req, res) => {
+  const { image } = req.body;
+  console.log('受け取った画像データ:', image); // 受け取った画像データをログに記録
+
+  try {
+    // 画像からテキストを抽出
+    const ocrResult = await Tesseract.recognize(Buffer.from(image, 'base64'), 'eng');
+    const extractedText = ocrResult.data.text;
+    console.log('抽出されたテキスト:', extractedText); // 抽出されたテキストをログに記録
+
+    // OpenAI APIに送信してSQLを生成
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+          model: 'gpt-4o', // 最新の適切なモデル名に置き換えてください
+          messages: [
+            { role: 'system', content: 'あなたはSQLマスターです。以下のテキストに基づいてSQLを提案してください。' },
+            { role: 'user', content: extractedText }
+          ],
+          max_tokens: 1000,
+          n: 1,
+          stop: null,
+          temperature: 0.7,
+      }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const answer = data.choices[0].message.content.trim();
+      console.log(`\n生成されたSQL:\n${answer}`); // 生成されたSQLをログに記録
+      res.json({ answer });
+    } else {
+      const errorDetails = await response.text();
+      console.error('SQL生成APIの呼び出しに失敗しました:', response.statusText, errorDetails);
+      res.status(response.status).send(response.statusText);
+    }
+  } catch (error) {
+    console.error('SQL生成中にエラーが発生しました:', error.message);
+    res.status(500).send(error.message);
+  }
+});
 
 app.post('/api/sqlChat', async (req, res) => {
   const { question, context } = req.body;
@@ -27,7 +79,7 @@ app.post('/api/sqlChat', async (req, res) => {
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           messages: [
             { role: 'system', content: `あなたはSQLマスターです。コンテキストのSQLのみを汲み取って質問に対する回答としてSQLを提案ください。: ${context}` },
             { role: 'user', content: question }
@@ -68,7 +120,7 @@ app.post('/api/summarize', async (req, res) => {
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           messages: [{ role: 'user', content: `あなたはシニアプロダクトマネージャーです。次のテキストを前向きな表現で箇条書きを中心として体系立てて要約してください。ですます調にならないようにしてください。読み込むテキスト以上の解釈をしないようにしてください。HTML改行コードを一文ずつ付加してください。各文は左寄せにしてください。: ${text}` }], // 日本語で要約をリクエスト
           max_tokens: 1000,
           n: 1,
@@ -107,7 +159,7 @@ app.post('/api/newSummarize', async (req, res) => {
           'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       body: JSON.stringify({
-          model: 'gpt-4o-mini',
+          model: 'gpt-4o',
           messages: [{ role: 'user', content: `次のテキストを要約してください: ${text}` }], // 日本語で要約をリクエスト
           max_tokens: 500,
           n: 1,
@@ -281,7 +333,7 @@ app.post('/api/chat', async (req, res) => {
             'Authorization': `Bearer ${OPENAI_API_KEY}`,
         },
         body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o',
             messages: [
               { role: 'system', content: `以下のコンテキストに基づいて質問に答えてください。回答はHTML改行コードを一文ずつ付加して極力詳細に回答ください。各文は左寄せにしてください。: ${context}` }, // Updated message
               { role: 'user', content: question }
