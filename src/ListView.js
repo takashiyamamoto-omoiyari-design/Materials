@@ -55,7 +55,7 @@ function ListView({ onSelectFile }) {
   return (
     <div className="App">
       <div className="header">
-        <div className="logo"><span className="icon">📄</span>ForUNotes</div>
+        <div className="logo"><span className="icon">📄</span>FOR UNOTE</div>
         <div className="toolbar">
           <button 
             style={{ backgroundColor: '#fff', border: '1px solid #b0c4de' }} 
